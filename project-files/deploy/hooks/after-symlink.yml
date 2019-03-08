@@ -1,0 +1,36 @@
+---
+- name: Remove public_html
+  file:
+    state: absent
+    path: "{{ project_deploy_dir }}/{{ project_web_root }}"
+
+- name: Add symlink to public_html
+  file:
+    src: "{{ project_deploy_dir }}/releases/{{ ansistrano_release_version }}/public"
+    dest: "{{ project_deploy_dir }}/{{ project_web_root }}"
+    state: link
+
+- name: Add symlink to current application directory
+  file:
+    src: "{{ project_deploy_dir }}/releases/{{ ansistrano_release_version }}"
+    dest: "{{ project_deploy_dir }}/current"
+    state: link
+
+- name: Create clear_opcache file
+  copy:
+    content: "<?php if (function_exists('opcache_reset')) { opcache_reset(); } ?>"
+    dest: "{{ project_deploy_dir }}/{{ project_web_root }}/clear_opcache.php"
+
+- name: Open clear_opcache file
+  uri:
+    url: "http://{{ website_ip }}/clear_opcache.php"
+    headers:
+      Host: "{{ website_host }}"
+      User-agent: "wst_cache_clearer"
+    timeout: 2
+  ignore_errors: yes
+
+# - name: Remove clear_opcache file
+#   file:
+#     state: absent
+#     path: "{{ lookup('env','DEPLOY_LOCATION') }}/{{ project_web_root }}/clear_opcache.php"

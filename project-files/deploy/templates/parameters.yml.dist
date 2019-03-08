@@ -1,0 +1,9 @@
+parameters:
+    database_driver:   pdo_mysql
+    database_host:     {{ lookup('env','DATABASE_HOST') }}
+    database_readonly_host: {{ lookup('env','DATABASE_READONLY_HOST') }}
+    database_port:     ~
+    database_name:     {{ lookup('env','DATABASE_NAME') }}
+    database_user:     {{ lookup('env','DATABASE_USERNAME') }}
+    database_password: {{ lookup('env','DATABASE_PASSWORD') }}
+    database_version:  8.0

@@ -1,0 +1,5 @@
+project_deploy_dir: /var/www/vhosts/demo.groningenphp.test
+project_web_root: public_html
+number_of_releases: 2
+website_ip: "{{ lookup('env', 'WEBSITE_IP') | default('127.0.0.1', true) }}"
+website_host: demo.groningenphp.test

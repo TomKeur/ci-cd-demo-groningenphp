@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# script/test: Run test suite for application. Optionally pass in a path to an
+#              individual test file to run a single test.
+
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+PROJECT_DIR=${PWD}
+
+# On macOS set :cached flag.
+[[ "$OSTYPE" == "darwin"* ]] && CACHED=":cached"
+
+echo "==> Running tests..."
+
+if [ -f "phpunit.xml.dist" ]; then
+    cp phpunit.xml.dist phpunit.xml
+    mkdir -p build/xml
+    docker run -t \
+    --volume ${PROJECT_DIR}:/data${CACHED} \
+    --volume ${HOME}/.composer:/home/php/.composer${CACHED} \
+    -e SYMFONY_DEPRECATIONS_HELPER=weak \
+    --workdir /data --rm tomkeur/php72:latest \
+    bin/phpunit --log-junit build/xml/file_junit.xml
+fi

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# script/cibuild: Setup environment for CI to run tests. This is primarily
+#                 designed to run on the continuous integration server.
+
+set -e
+if [[ "$(id -u)" == 0 ]]; then
+    # We don't want a file permission war.
+    echo "ERROR: DO NOT RUN scripts-to-rule-them-all AS ROOT!" 1>&2
+    exit 1
+fi
+
+PROJECT_DIR=${PWD}
+
+# On macOS set :cached flag.
+[[ "$OSTYPE" == "darwin"* ]] && CACHED=":cached"
+
+
+SRC_FOLDER="."
+
+if [ -f "composer.json" ]; then
+    echo "==> Optimizing composer autoload, remove dev dependencies..."
+    docker run -t \
+    --volume ${PROJECT_DIR}:/data${CACHED} \
+    --volume ${HOME}/.composer:/home/php/.composer${CACHED} \
+    -e SYMFONY_ENV=prod \
+    -e APP_ENV=prod \
+    --workdir /data --rm tomkeur/php72:latest \
+    composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+fi
+
+# if [ -f "package.json" ]; then
+#     echo "==> Installing npm dependencies..."
+#     docker run -t \
+#     --volume ${PROJECT_DIR}:/data${CACHED} \
+#     --volume ${HOME}/node/.npm:/home/node/.npm${CACHED} \
+#     --volume ${HOME}/node/.cache:/home/`node/.cache${CACHED} \
+#     --workdir /data/code --rm node:8.15.1-jessie \
+#     yarn deploy
+# fi

@@ -1,0 +1,8 @@
+# All the required roles from Ansible Galaxy. Run with:
+# ansible-galaxy install -r requirements.yml -p roles/
+- src: ansistrano.deploy
+  version: 3.1.0
+
+- src: ansistrano.rollback
+  version: 3.0.0
+

@@ -1,0 +1,28 @@
+---
+- hosts: all
+  vars_files:
+    - ./vars/vars.yml
+  vars:
+    release_console_path: "{{ ansistrano_release_path.stdout }}/bin/console"
+    
+    # Ansistrano vars
+    ansistrano_deploy_from: "{{ playbook_dir }}/../"
+    ansistrano_deploy_to: "{{ project_deploy_dir }}" # Base path to deploy to.
+    ansistrano_current_dir: "{{ project_web_root }}" # Directory
+    ansistrano_keep_releases: "{{ number_of_releases }}" # Releases to keep after a new deployment. See "Pruning old releases".
+    ansistrano_deploy_via: rsync # Method used to deliver the code to the server. Options are copy, rsync, git, svn, s3 or download
+    ansistrano_allow_anonymous_stats: no # Don't send statistics.
+
+    # Ansistrano Hooks
+    ansistrano_after_symlink_shared_tasks_file: "{{ playbook_dir }}/hooks/after-symlink-shared.yml"
+    ansistrano_after_symlink_tasks_file: "{{ playbook_dir }}/hooks/after-symlink.yml"
+
+    # Shared paths.
+    ansistrano_shared_paths:
+      - var/logs
+
+  environment:
+    SYMFONY_ENV: prod
+
+  roles:
+    - ansistrano.deploy
